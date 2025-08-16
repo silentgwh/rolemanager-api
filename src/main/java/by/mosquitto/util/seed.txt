@@ -1,0 +1,53 @@
+1. Пользователь с ролью SYSADMIN
+-- Вставим профиль и роль
+INSERT INTO profile (name, comment, user_corr) VALUES ('SYSADMIN_PROFILE', 'Профиль системного администратора', NULL);
+INSERT INTO role (name, type, comment, user_corr) VALUES ('SYSADMIN', 1, 'Системный администратор', NULL);
+
+-- Свяжем профиль и роль
+INSERT INTO profile_role (id_prof, id_role) VALUES (
+    (SELECT id FROM profile WHERE name = 'SYSADMIN_PROFILE'),
+    (SELECT id FROM role WHERE name = 'SYSADMIN')
+);
+
+-- Создадим пользователя
+INSERT INTO users (username, password, profile_id, role_id)
+VALUES (
+    'sysadmin',
+    '$2a$10$7QeW9ZQwYxvKxU9eTzFZ3eKZzU9eTzFZ3eKZzU9eTzFZ3eKZzU9eTzFZ3e', -- bcrypt-хеш пароля "admin123"
+    (SELECT id FROM profile WHERE name = 'SYSADMIN_PROFILE'),
+    (SELECT id FROM role WHERE name = 'SYSADMIN')
+);
+
+Spring Security с BCrypt, то пароль "admin123" должен быть захеширован заранее.
+
+
+
+2. Привилегии для тестов
+INSERT INTO privilege (name, type, name_2, comment, user_corr)
+VALUES
+('MANAGE_USERS', 1, 'Управление пользователями', 'Создание и удаление пользователей', (SELECT id FROM users WHERE username = 'sysadmin')),
+('VIEW_REPORTS', 0, 'Просмотр отчётов', 'Доступ к аналитике', (SELECT id FROM users WHERE username = 'sysadmin'));
+
+
+3. Роль с привилегиями
+INSERT INTO role (name, type, comment, user_corr)
+VALUES ('ADMIN', 0, 'Администратор системы', (SELECT id FROM users WHERE username = 'sysadmin'));
+
+-- Связь роли и привилегий
+INSERT INTO role_privilege (id_role, id_priv)
+VALUES
+((SELECT id FROM role WHERE name = 'ADMIN'), (SELECT id FROM privilege WHERE name = 'MANAGE_USERS')),
+((SELECT id FROM role WHERE name = 'ADMIN'), (SELECT id FROM privilege WHERE name = 'VIEW_REPORTS'));
+
+
+4. Профиль с ролью ADMIN
+INSERT INTO profile (name, comment, user_corr)
+VALUES ('ADMIN_PROFILE', 'Профиль администратора', (SELECT id FROM users WHERE username = 'sysadmin'));
+
+-- Связь профиля и роли
+INSERT INTO profile_role (id_prof, id_role)
+VALUES (
+    (SELECT id FROM profile WHERE name = 'ADMIN_PROFILE'),
+    (SELECT id FROM role WHERE name = 'ADMIN')
+);
+

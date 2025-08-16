@@ -1,3 +1,16 @@
+==============================================================================================================
+
+TRUNCATE TABLE
+    profile_role,
+    role_privilege,
+    users,
+    profile,
+    role,
+    privilege
+RESTART IDENTITY CASCADE;
+
+
+==============================================================================================================
 -- Таблица пользователей
 CREATE TABLE IF NOT EXISTS users (
     id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
@@ -66,7 +79,7 @@ CREATE TABLE "user" (
     FOREIGN KEY (id_role) REFERENCES role(id) ON DELETE SET NULL
 );
 
-==========================================================================================
+==============================================================================================================
 -- Таблица пользователей
 CREATE TABLE users (
     id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
