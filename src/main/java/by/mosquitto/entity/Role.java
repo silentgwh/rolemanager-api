@@ -9,12 +9,16 @@ import java.util.Set;
 
 @Entity
 @Table(name = "role")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@ToString(exclude = "userCorr")
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Role {
 
+    @EqualsAndHashCode.Include
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -23,7 +27,7 @@ public class Role {
     private String name;
 
     @Column(nullable = false)
-    private Short type; // 0 = приватная, 1 = публичная
+    private Short type;
 
     private String comment;
 

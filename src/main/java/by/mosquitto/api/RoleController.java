@@ -24,7 +24,7 @@ public class RoleController {
     private final RoleService roleService;
 
     @PostMapping
-    @PreAuthorize("hasRole('SYSADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SYSADMIN')")
     public ResponseEntity<RoleResponseDto> createRole(
             @Valid @RequestBody RoleDto dto,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
@@ -33,7 +33,7 @@ public class RoleController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('SYSADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SYSADMIN')")
     public ResponseEntity<RoleResponseDto> updateRole(
             @PathVariable Long id,
             @Valid @RequestBody RoleDto dto,
@@ -43,7 +43,7 @@ public class RoleController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('SYSADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SYSADMIN')")
     public ResponseEntity<Void> deleteRole(@PathVariable Long id) {
         roleService.delete(id);
         return ResponseEntity.noContent().build();
