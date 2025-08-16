@@ -4,29 +4,31 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
+@Entity
+@Table(name = "privilege")
 @Data
-@Builder
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
-@Table(name = "privilege", uniqueConstraints = @UniqueConstraint(columnNames = "name"))
+@Builder
 public class Privilege {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
-    @Column(name = "name", nullable = false)
-    private String name; // латиница, уникально
+    @Column(nullable = false, unique = true)
+    private String name;
 
-    @Column(name = "type", nullable = false)
-    private Short type; // 0 = приватный, 1 = публичный
+    @Column(nullable = false)
+    private Short type; // 0 = приватная, 1 = публичная
 
-    @Column(name = "name_2", nullable = false)
-    private String name2; // Название
+    @Column(name = "name_2")
+    private String name2;
 
-    @Column(name = "comment", nullable = false)
     private String comment;
 
     @Column(name = "date_corr")
@@ -36,10 +38,6 @@ public class Privilege {
     @JoinColumn(name = "user_corr")
     private User userCorr;
 
-    @Column(nullable = false)
-    private boolean isPrivate;
-
-    public Privilege(Long id) {
-        this.id = id;
-    }
+    @ManyToMany(mappedBy = "privileges")
+    private Set<Role> roles = new HashSet<>();
 }

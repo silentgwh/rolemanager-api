@@ -6,18 +6,19 @@ import lombok.Data;
 
 @Data
 public class PrivilegeDto {
-    @NotBlank(message = "Поле 'name' обязательно")
-    @Pattern(regexp = "^[a-zA-Z]+$", message = "Поле 'name' должно содержать только латинские буквы")
+
+    @NotBlank(message = "Поле 'name' не должно быть пустым")
+    @Pattern(regexp = "^[a-zA-Z0-9_]+$", message = "Поле 'name' должно содержать только латинские буквы, цифры и подчёркивания")
     private String name;
 
     @NotNull(message = "Поле 'type' обязательно")
-    @Min(0)
-    @Max(1)
+    @Min(value = 0, message = "Тип должен быть 0 или 1")
+    @Max(value = 1, message = "Тип должен быть 0 или 1")
     private Short type;
 
-    @NotBlank(message = "Поле 'name2' обязательно")
+    @NotBlank(message = "Поле 'name2' не должно быть пустым")
     private String name2;
 
-    @NotBlank(message = "Поле 'comment' обязательно")
+    @NotBlank(message = "Поле 'comment' не должно быть пустым")
     private String comment;
 }

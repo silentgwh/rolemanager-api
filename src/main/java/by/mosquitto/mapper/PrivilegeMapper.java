@@ -29,7 +29,7 @@ public class PrivilegeMapper {
         dto.setName2(entity.getName2());
         dto.setComment(entity.getComment());
         dto.setDateCorr(entity.getDateCorr());
-        dto.setUserCorrId(entity.getUserCorr() != null ? entity.getUserCorr().getId() : null);
+        dto.setUserCorrId(Long.valueOf(entity.getUserCorr() != null ? entity.getUserCorr().getId() : null));
         return dto;
     }
 }

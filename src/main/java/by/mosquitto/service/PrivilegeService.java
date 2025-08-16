@@ -6,7 +6,6 @@ import by.mosquitto.entity.Privilege;
 import by.mosquitto.entity.User;
 import by.mosquitto.mapper.PrivilegeMapper;
 import by.mosquitto.repository.PrivilegeRepository;
-import by.mosquitto.repository.RolePrivilegeRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,7 +18,6 @@ import java.util.List;
 public class PrivilegeService {
 
     private final PrivilegeRepository privilegeRepository;
-    private final RolePrivilegeRepository rolePrivilegeRepository;
     private final PrivilegeMapper mapper;
 
     public List<PrivilegeResponseDto> getAll() {
@@ -61,15 +59,18 @@ public class PrivilegeService {
         existing.setDateCorr(LocalDateTime.now());
         existing.setUserCorr(user);
 
-        return mapper.toDto(privilegeRepository.save(existing));
+        Privilege updated = privilegeRepository.save(existing);
+        return mapper.toDto(updated);
     }
 
     public void delete(Long id) {
-        if (rolePrivilegeRepository.existsByPrivilegeId(id)) {
+        Privilege privilege = privilegeRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Привилегия не найдена"));
+
+        if (!privilege.getRoles().isEmpty()) {
             throw new IllegalStateException("Невозможно удалить: привилегия связана с ролями");
         }
 
-        privilegeRepository.deleteById(id);
+        privilegeRepository.delete(privilege);
     }
-
 }

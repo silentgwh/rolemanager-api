@@ -1,6 +1,6 @@
 package by.mosquitto.seed;
-import by.mosquitto.entity.*;
 
+import by.mosquitto.entity.*;
 import by.mosquitto.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -14,7 +14,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Component
-public class SysAdminSeeder implements CommandLineRunner {
+public class AdminSeeder implements CommandLineRunner {
 
     private final UserRepository userRepository;
     private final ProfileRepository profileRepository;
@@ -22,16 +22,16 @@ public class SysAdminSeeder implements CommandLineRunner {
     private final PrivilegeRepository privilegeRepository;
     private final PasswordEncoder passwordEncoder;
 
-    private static final Logger log = LoggerFactory.getLogger(SysAdminSeeder.class);
+    private static final Logger log = LoggerFactory.getLogger(AdminSeeder.class);
 
     @Override
     public void run(String... args) {
-        final String username = "sysadmin";
-        final String profileName = "SYSADMIN_PROFILE";
-        final String roleName = "SYSADMIN";
+        final String username = "admin";
+        final String profileName = "ADMIN_PROFILE";
+        final String roleName = "ADMIN";
 
         if (userRepository.existsByUsername(username)) {
-            log.info("Sysadmin user already exists");
+            log.info("Admin user already exists");
             return;
         }
 
@@ -40,8 +40,8 @@ public class SysAdminSeeder implements CommandLineRunner {
                 .orElseGet(() -> {
                     Role r = Role.builder()
                             .name(roleName)
-                            .type((short) 0) // системная роль
-                            .comment("System administrator role")
+                            .type((short) 1) // публичная роль
+                            .comment("Administrator role")
                             .dateCorr(LocalDateTime.now())
                             .build();
                     return roleRepository.save(r);
@@ -52,7 +52,7 @@ public class SysAdminSeeder implements CommandLineRunner {
                 .orElseGet(() -> {
                     Profile p = Profile.builder()
                             .name(profileName)
-                            .comment("System administrator profile")
+                            .comment("Administrator profile")
                             .dateCorr(LocalDateTime.now())
                             .build();
                     return profileRepository.save(p);
@@ -61,13 +61,13 @@ public class SysAdminSeeder implements CommandLineRunner {
         // Create User
         User user = User.builder()
                 .username(username)
-                .password(passwordEncoder.encode("sys123"))
+                .password(passwordEncoder.encode("admin123"))
                 .profile(profile)
                 .role(role)
                 .build();
 
         User savedUser = userRepository.save(user);
-        log.info("Sysadmin user created with ID {}", savedUser.getId());
+        log.info("Admin user created with ID {}", savedUser.getId());
 
         // Update user_corr
         profile.setUserCorr(savedUser);
@@ -78,12 +78,13 @@ public class SysAdminSeeder implements CommandLineRunner {
         // Link Role to Profile
         profile.getRoles().add(role);
         profileRepository.save(profile);
-        log.info("Linked SYSADMIN_ROLE to SYSADMIN_PROFILE");
+        log.info("Linked ADMIN_ROLE to ADMIN_PROFILE");
 
-        // Link all privileges to Role
-        List<Privilege> allPrivileges = privilegeRepository.findAll();
-        role.getPrivileges().addAll(allPrivileges);
+        // Link only public privileges to Role
+        List<Privilege> publicPrivileges = privilegeRepository.findByType((short) 1);
+        role.getPrivileges().addAll(publicPrivileges);
         roleRepository.save(role);
-        log.info("Linked {} privileges to SYSADMIN_ROLE", allPrivileges.size());
+        log.info("Linked {} public privileges to ADMIN_ROLE", publicPrivileges.size());
     }
 }
+

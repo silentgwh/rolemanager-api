@@ -6,7 +6,7 @@ import by.mosquitto.entity.Privilege;
 import by.mosquitto.entity.Role;
 import by.mosquitto.entity.User;
 import by.mosquitto.mapper.RoleMapper;
-import by.mosquitto.repository.RolePrivilegeRepository;
+import by.mosquitto.repository.PrivilegeRepository;
 import by.mosquitto.repository.RoleRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +23,7 @@ public class RoleService {
 
     private final RoleRepository roleRepository;
     private final RoleMapper roleMapper;
-    private final RolePrivilegeRepository rolePrivilegeRepository;
+    private final PrivilegeRepository privilegeRepository;
 
     public RoleResponseDto create(RoleDto dto, User user) {
         if (roleRepository.existsByNameIgnoreCase(dto.getName())) {
@@ -31,6 +31,13 @@ public class RoleService {
         }
 
         Role role = roleMapper.toEntity(dto, user);
+
+        // Привязка привилегий
+        if (dto.getPrivilegeIds() != null && !dto.getPrivilegeIds().isEmpty()) {
+            List<Privilege> privileges = privilegeRepository.findAllById(dto.getPrivilegeIds());
+            role.setPrivileges(new HashSet<>(privileges));
+        }
+
         Role saved = roleRepository.save(role);
         return roleMapper.toDto(saved);
     }
@@ -50,21 +57,25 @@ public class RoleService {
         role.setDateCorr(LocalDateTime.now());
         role.setUserCorr(user);
 
-        Set<Privilege> privileges = new HashSet<>(dto.getPrivilegeIds().stream()
-                .map(Privilege::new)
-                .toList());
-        role.setPrivileges(privileges);
+        // Обновление привилегий
+        if (dto.getPrivilegeIds() != null) {
+            List<Privilege> privileges = privilegeRepository.findAllById(dto.getPrivilegeIds());
+            role.setPrivileges(new HashSet<>(privileges));
+        }
 
         Role updated = roleRepository.save(role);
         return roleMapper.toDto(updated);
     }
 
     public void delete(Long id) {
-        if (rolePrivilegeRepository.existsByRoleId(id)) {
+        Role role = roleRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Роль не найдена"));
+
+        if (!role.getProfiles().isEmpty()) {
             throw new IllegalStateException("Невозможно удалить: роль связана с профилями");
         }
 
-        roleRepository.deleteById(id);
+        roleRepository.delete(role);
     }
 
     public List<RoleResponseDto> getAll() {

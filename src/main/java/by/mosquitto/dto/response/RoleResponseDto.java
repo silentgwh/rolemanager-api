@@ -7,7 +7,7 @@ import java.util.List;
 
 @Data
 public class RoleResponseDto {
-    private Long id;
+    private Integer id;
     private String name;
     private Short type;
     private String comment;

@@ -1,21 +1,14 @@
 package by.mosquitto.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-
-@Builder
-@Data
 @Entity
-@Table(name = "users")
+@Table(name = "app_user")
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class User {
 
     @Id
@@ -35,16 +28,4 @@ public class User {
     @ManyToOne
     @JoinColumn(name = "role_id")
     private Role role;
-
-    @Column(name = "date_corr")
-    private LocalDateTime dateCorr;
-
-    @Builder.Default
-    @ManyToMany
-    @JoinTable(
-            name = "user_privilege",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "privilege_id")
-    )
-    private List<Privilege> privileges = new ArrayList<>();
 }

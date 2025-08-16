@@ -7,23 +7,23 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
+@Entity
+@Table(name = "role")
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
-@Table(name = "role", uniqueConstraints = @UniqueConstraint(columnNames = "name"))
+@Builder
 public class Role {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String name;
 
     @Column(nullable = false)
-    private Short type;
+    private Short type; // 0 = приватная, 1 = публичная
 
     private String comment;
 
@@ -34,7 +34,9 @@ public class Role {
     @JoinColumn(name = "user_corr")
     private User userCorr;
 
-    @Builder.Default
+    @ManyToMany(mappedBy = "roles")
+    private Set<Profile> profiles = new HashSet<>();
+
     @ManyToMany
     @JoinTable(
             name = "role_privilege",
@@ -42,8 +44,4 @@ public class Role {
             inverseJoinColumns = @JoinColumn(name = "id_priv")
     )
     private Set<Privilege> privileges = new HashSet<>();
-
-    public Role(Long id) {
-        this.id = id;
-    }
 }

@@ -7,7 +7,7 @@ import java.util.List;
 
 @Data
 public class ProfileResponseDto {
-    private Long id;
+    private Integer id;
     private String name;
     private String comment;
     private LocalDateTime dateCorr;

@@ -7,6 +7,7 @@ import by.mosquitto.entity.Role;
 import by.mosquitto.entity.User;
 import by.mosquitto.mapper.ProfileMapper;
 import by.mosquitto.repository.ProfileRepository;
+import by.mosquitto.repository.RoleRepository;
 import by.mosquitto.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,7 @@ import java.util.Set;
 public class ProfileService {
 
     private final ProfileRepository profileRepository;
+    private final RoleRepository roleRepository;
     private final ProfileMapper profileMapper;
 
     public ProfileResponseDto create(ProfileDto dto, User user) {
@@ -48,14 +50,15 @@ public class ProfileService {
         profile.setDateCorr(LocalDateTime.now());
         profile.setUserCorr(user);
 
-        Set<Role> roles = new HashSet<>(dto.getRoleIds().stream()
-                .map(Role::new)
-                .toList());
-        profile.setRoles(roles);
+        if (dto.getRoleIds() != null) {
+            List<Role> roles = roleRepository.findAllById(dto.getRoleIds());
+            profile.setRoles(new HashSet<>(roles));
+        }
 
         Profile updated = profileRepository.save(profile);
         return profileMapper.toDto(updated);
     }
+
 
     public void delete(Long id) {
         if (!profileRepository.existsById(id)) {

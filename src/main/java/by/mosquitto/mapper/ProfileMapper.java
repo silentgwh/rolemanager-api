@@ -39,7 +39,7 @@ public class ProfileMapper {
         dto.setName(profile.getName());
         dto.setComment(profile.getComment());
         dto.setDateCorr(profile.getDateCorr());
-        dto.setUserCorrId(profile.getUserCorr() != null ? profile.getUserCorr().getId() : null);
+        dto.setUserCorrId(Long.valueOf(profile.getUserCorr() != null ? profile.getUserCorr().getId() : null));
         dto.setRoles(profile.getRoles().stream()
                 .map(roleMapper::toDto)
                 .toList());
