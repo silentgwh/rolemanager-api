@@ -37,7 +37,7 @@ public class Privilege {
     private User userCorr;
 
     @Column(nullable = false)
-    private boolean isPrivate; // 🔐 ключевой флаг
+    private boolean isPrivate;
 
     public Privilege(Long id) {
         this.id = id;

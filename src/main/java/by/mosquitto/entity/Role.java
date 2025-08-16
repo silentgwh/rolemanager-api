@@ -7,13 +7,14 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
+@Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
 @Entity
 @Table(name = "role", uniqueConstraints = @UniqueConstraint(columnNames = "name"))
 public class Role {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -33,6 +34,7 @@ public class Role {
     @JoinColumn(name = "user_corr")
     private User userCorr;
 
+    @Builder.Default
     @ManyToMany
     @JoinTable(
             name = "role_privilege",

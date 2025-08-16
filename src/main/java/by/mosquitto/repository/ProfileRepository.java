@@ -10,5 +10,7 @@ import java.util.Optional;
 public interface ProfileRepository extends JpaRepository<Profile, Long> {
     boolean existsByNameIgnoreCase(String name);
     Optional<Profile> findByNameIgnoreCase(String name);
+    Optional<Profile> findByName(String name); // 👈 Добавь это, если используешь без ignoreCase
+    boolean existsByName(String name);
 }
 
