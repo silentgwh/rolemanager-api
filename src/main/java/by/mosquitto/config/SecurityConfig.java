@@ -12,8 +12,12 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
@@ -25,37 +29,34 @@ public class SecurityConfig {
     private final UserDetailsServiceImpl userDetailsService;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/css/**", "/js/**").permitAll()
-                        .anyRequest().authenticated()
+                        .requestMatchers("/api/auth/login").authenticated()
+                        .anyRequest().permitAll()
                 )
-                .httpBasic(Customizer.withDefaults()) // вместо formLogin
-                .logout(logout -> logout
-                        .logoutUrl("/logout")
-                        .logoutSuccessHandler((request, response, authentication) -> {
-                            response.setStatus(HttpServletResponse.SC_OK);
-                        })
-                        .permitAll()
-                )
-                .exceptionHandling(ex -> ex
-                        .authenticationEntryPoint((request, response, authException) -> {
-                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                            response.getWriter().write("Unauthorized");
-                        })
-                );
+                .httpBasic(Customizer.withDefaults()); // Включаем Basic Auth
 
         return http.build();
     }
 
 
     @Bean
+    public UserDetailsService users() {
+        UserDetails user = User.withDefaultPasswordEncoder()
+                .username("sysadmin")
+                .password("sys123")
+                .roles("ADMIN")
+                .build();
+        return new InMemoryUserDetailsManager(user);
+    }
+
+    @Bean
     public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
         provider.setUserDetailsService(userDetailsService);
-        provider.setPasswordEncoder(new BCryptPasswordEncoder());
+        provider.setPasswordEncoder(passwordEncoder());
         return provider;
     }
 

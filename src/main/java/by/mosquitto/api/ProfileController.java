@@ -43,7 +43,7 @@ public class ProfileController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('SYSADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SYSADMIN')")
     public ResponseEntity<Void> deleteProfile(@PathVariable Long id) {
         profileService.delete(id);
         return ResponseEntity.noContent().build();

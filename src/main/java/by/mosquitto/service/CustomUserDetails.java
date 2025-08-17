@@ -9,19 +9,19 @@ import java.util.Collection;
 import java.util.List;
 
 @Data
-public class CustomUserDetailsService implements UserDetails {
+public class CustomUserDetails implements UserDetails {
 
     private final User user;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        String roleName = "ROLE_" + user.getRole().getName();
-        return List.of(new SimpleGrantedAuthority(roleName));
+        String roleName = user.getRole() != null ? user.getRole().getName() : "NO_ROLE";
+        return List.of(new SimpleGrantedAuthority("ROLE_" + roleName));
     }
 
     @Override
     public String getPassword() {
-        return user.getPassword();
+        return user.getPassword(); // должен быть BCrypt-хэш
     }
 
     @Override
@@ -30,24 +30,16 @@ public class CustomUserDetailsService implements UserDetails {
     }
 
     @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
+    public boolean isAccountNonExpired() { return true; }
 
     @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
+    public boolean isAccountNonLocked() { return true; }
 
     @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
+    public boolean isCredentialsNonExpired() { return true; }
 
     @Override
-    public boolean isEnabled() {
-        return true;
-    }
+    public boolean isEnabled() { return true; }
 
     public User getUser() {
         return user;
