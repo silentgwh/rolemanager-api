@@ -8,7 +8,6 @@ import by.mosquitto.entity.User;
 import by.mosquitto.mapper.ProfileMapper;
 import by.mosquitto.repository.ProfileRepository;
 import by.mosquitto.repository.RoleRepository;
-import by.mosquitto.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,7 +15,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -64,9 +62,6 @@ public class ProfileService {
         if (!profileRepository.existsById(id)) {
             throw new EntityNotFoundException("Профиль не найден");
         }
-
-        // TODO: Проверка на связанные пользователи, если появится таблица USER_PROFILE
-
         profileRepository.deleteById(id);
     }
 

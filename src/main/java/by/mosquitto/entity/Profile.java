@@ -2,7 +2,6 @@ package by.mosquitto.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import lombok.extern.java.Log;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
